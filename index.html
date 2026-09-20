@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ficha de revisión de equipos de trabajo en alturas</title>
+<meta name="theme-color" content="#16325C">
+<meta name="application-name" content="Revisión EPP">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Revisión EPP">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F2F5FA;
+    --surface: #FFFFFF;
+    --tint: #E3EAF5;
+    --ink: #152238;
+    --muted: #52627A;
+    --line: #D0D9E6;
+    --accent: #1B3A6B;
+    --accent-ink: #FFFFFF;
+    --focus: #1B3A6B;
+    --brand: #16325C;
+    --brand-ink: #FFFFFF;
+    --brand-sub: #B9CFF0;
+    --on: #FFFFFF;
+    --b: #35803A;
+    --v: #94600F;
+    --r: #B84A16;
+    --d: #B3261E;
+    --na: #5F6B75;
+    --warn-bg: #FBEEEC;
+    --ok-bg: #E7F3E8;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0C1524;
+      --surface: #142035;
+      --tint: #1A2B47;
+      --ink: #E6ECF5;
+      --muted: #9DB0CB;
+      --line: #27395A;
+      --accent: #8FB8F0;
+      --accent-ink: #0A1830;
+      --focus: #A9C9F5;
+      --brand: #12284A;
+      --brand-ink: #FFFFFF;
+      --brand-sub: #A9C4EA;
+      --on: #0A1830;
+      --b: #6CC47A;
+      --v: #E3AE52;
+      --r: #F09059;
+      --d: #F27B75;
+      --na: #9FB0B6;
+      --warn-bg: #3A2321;
+      --ok-bg: #1B3322;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0C1524;
+    --surface: #142035;
+    --tint: #1A2B47;
+    --ink: #E6ECF5;
+    --muted: #9DB0CB;
+    --line: #27395A;
+    --accent: #8FB8F0;
+    --accent-ink: #0A1830;
+    --focus: #A9C9F5;
+    --brand: #12284A;
+    --brand-ink: #FFFFFF;
+    --brand-sub: #A9C4EA;
+    --on: #0A1830;
+    --b: #6CC47A;
+    --v: #E3AE52;
+    --r: #F09059;
+    --d: #F27B75;
+    --na: #9FB0B6;
+    --warn-bg: #3A2321;
+    --ok-bg: #1B3322;
+  }
+
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); background: var(--paper); }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Barlow", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 0 18px; }
+
+  /* Encabezado */
+  .band { background: var(--brand); }
+  .head { display: flex; gap: 20px; align-items: center; padding: 26px 0 18px; flex-wrap: wrap; }
+  .titles { flex: 1 1 260px; min-width: 0; }
+  .titles p.kicker { margin: 0 0 2px; font-size: 14px; color: var(--brand-sub); }
+  h1 {
+    margin: 0; font-family: "Barlow Semi Condensed", "Barlow", system-ui, sans-serif;
+    font-weight: 600; font-size: clamp(30px, 7vw, 42px); line-height: 1.05; letter-spacing: -0.01em; color: var(--brand-ink);
+  }
+  .titles p.sub { margin: 4px 0 0; font-size: 19px; font-weight: 500; color: var(--brand-sub); }
+  .intro { margin: 0 0 16px; color: var(--muted); max-width: 62ch; }
+
+  /* Franja de avance */
+  .strip {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10;
+    background: var(--paper); border-top: 3px solid var(--accent); border-bottom: 1px solid var(--line);
+    padding: 10px 0 8px;
+  }
+  .cells { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 4px; }
+  .cell {
+    display: flex; align-items: center; justify-content: center; height: 32px;
+    border: 1.5px solid var(--line); border-radius: 4px; background: var(--surface);
+    font-family: "Barlow Semi Condensed", "Barlow", sans-serif; font-weight: 600; font-size: 14px;
+    color: var(--muted); text-decoration: none;
+  }
+  .cell:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .cell[data-state="B"]  { background: var(--b);  border-color: var(--b);  color: var(--on); }
+  .cell[data-state="V"]  { background: var(--v);  border-color: var(--v);  color: var(--on); }
+  .cell[data-state="R"]  { background: var(--r);  border-color: var(--r);  color: var(--on); }
+  .cell[data-state="D"]  { background: var(--d);  border-color: var(--d);  color: var(--on); }
+  .cell[data-state="NA"] { background: var(--na); border-color: var(--na); color: var(--on); }
+  .strip-txt { display: flex; justify-content: space-between; gap: 12px; margin: 6px 0 0; font-size: 13px; color: var(--muted); }
+
+  /* Secciones */
+  h2 {
+    margin: 36px 0 14px; padding-top: 14px; border-top: 1px solid var(--line);
+    font-family: "Barlow Semi Condensed", "Barlow", sans-serif; font-weight: 600; font-size: 24px; line-height: 1.15;
+  }
+  h2.first { margin-top: 28px; border-top: 0; padding-top: 0; }
+  .sub-h { margin: 22px 0 10px; font-weight: 600; font-size: 16px; color: var(--accent); }
+  .grid { display: grid; gap: 14px 16px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+  .f { display: block; }
+  .f .lbl { display: block; margin-bottom: 4px; font-size: 13px; font-weight: 500; color: var(--muted); }
+  .f .hint { display: block; margin-top: 4px; font-size: 12.5px; color: var(--muted); }
+  input[type="text"], input[type="date"], select, textarea {
+    width: 100%; min-height: 46px; padding: 10px 12px; font: inherit; font-size: 16px;
+    color: var(--ink); background: var(--surface);
+    border: 1px solid var(--line); border-radius: 6px;
+  }
+  textarea { min-height: 96px; resize: vertical; line-height: 1.4; }
+  input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; border-color: var(--focus); }
+  .selector { margin-top: 24px; }
+  select { font-weight: 500; }
+  .note { margin: 8px 0 0; font-size: 13px; color: var(--muted); }
+
+  /* Leyenda */
+  .legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 4px 16px; margin: 0 0 6px; padding: 0; font-size: 13.5px; color: var(--muted); }
+  .legend div { display: flex; gap: 8px; align-items: baseline; }
+  .legend dt { font-family: "Barlow Semi Condensed", "Barlow", sans-serif; font-weight: 700; min-width: 26px; }
+  .legend dd { margin: 0; }
+  .legend .k-B { color: var(--b); } .legend .k-V { color: var(--v); } .legend .k-R { color: var(--r); }
+  .legend .k-D { color: var(--d); } .legend .k-NA { color: var(--na); }
+
+  /* Criterios */
+  .crit {
+    --rule: var(--line);
+    border-left: 6px solid var(--rule);
+    border-bottom: 1px solid var(--line);
+    padding: 16px 0 18px 16px;
+    scroll-margin-top: 120px;
+    transition: border-left-color .15s;
+  }
+  .crit[data-state="B"]  { --rule: var(--b); }
+  .crit[data-state="V"]  { --rule: var(--v); }
+  .crit[data-state="R"]  { --rule: var(--r); }
+  .crit[data-state="D"]  { --rule: var(--d); }
+  .crit[data-state="NA"] { --rule: var(--na); }
+  .crit h3 {
+    margin: 0 0 6px; font-family: "Barlow Semi Condensed", "Barlow", sans-serif;
+    font-weight: 600; font-size: 20px; line-height: 1.2;
+  }
+  .pts { margin: 0; padding-left: 18px; color: var(--muted); font-size: 15px; }
+  .pts li { margin: 2px 0; }
+  .opts { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; margin-top: 14px; }
+  .opt { position: relative; display: block; cursor: pointer; }
+  .opt input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+  .opt .box {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    min-height: 54px; padding: 6px 2px;
+    background: var(--surface); color: var(--ink);
+    border: 1.5px solid var(--line); border-radius: 6px;
+    transition: background-color .12s, border-color .12s, color .12s;
+  }
+  .opt:hover .box { border-color: var(--c); }
+  .opt .code { font-family: "Barlow Semi Condensed", "Barlow", sans-serif; font-weight: 600; font-size: 20px; line-height: 1; }
+  .opt .txt { font-size: 11.5px; line-height: 1.1; color: var(--muted); }
+  .opt input:checked + .box { background: var(--c); border-color: var(--c); color: var(--on); }
+  .opt input:checked + .box .txt { color: var(--on); }
+  .opt input:focus-visible + .box { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .opt-B { --c: var(--b); } .opt-V { --c: var(--v); } .opt-R { --c: var(--r); }
+  .opt-D { --c: var(--d); } .opt-NA { --c: var(--na); }
+
+  /* Fotos */
+  .photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin: 0 0 12px; }
+  .photos:empty { display: none; }
+  .ph { margin: 0; display: flex; flex-direction: column; gap: 6px; }
+  .ph .thumb { position: relative; aspect-ratio: 4 / 3; background: var(--tint); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+  .ph img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .ph .ph-rm {
+    position: absolute; top: 6px; right: 6px; min-height: 34px; padding: 4px 10px;
+    font: inherit; font-size: 13px; font-weight: 500; color: #FFFFFF;
+    background: rgba(20, 30, 35, .78); border: 0; border-radius: 4px; cursor: pointer;
+  }
+  .ph .ph-rm:focus-visible { outline: 3px solid #FFFFFF; outline-offset: 2px; }
+  .ph .ph-cap { min-height: 40px; padding: 6px 10px; font-size: 14px; }
+  .photo-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .photo-actions .note { margin: 0; }
+
+  /* Veredicto */
+  .verd { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; border: 0; margin: 0; padding: 0; min-width: 0; }
+  .verd label { position: relative; display: flex; align-items: center; gap: 12px; padding: 14px 16px; min-height: 60px; background: var(--surface); border: 1.5px solid var(--line); border-radius: 6px; cursor: pointer; font-weight: 500; }
+  .verd input { width: 22px; height: 22px; margin: 0; accent-color: var(--c); flex: none; }
+  .verd label:has(input:checked) { border-color: var(--c); box-shadow: inset 0 0 0 1px var(--c); }
+  .verd label:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .v-apto { --c: var(--b); } .v-no { --c: var(--d); }
+  .verd-hint { margin: 10px 0 0; padding: 10px 12px; border-radius: 6px; background: var(--warn-bg); color: var(--ink); font-size: 14px; border-left: 4px solid var(--d); }
+
+  /* Acciones */
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin: 30px 0 12px; }
+  .btn {
+    min-height: 52px; padding: 12px 24px; font: inherit; font-weight: 600; font-size: 17px; cursor: pointer;
+    border-radius: 6px; border: 1.5px solid var(--accent); background: var(--accent); color: var(--accent-ink);
+  }
+  .btn:hover { filter: brightness(1.08); }
+  .btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+  .btn[disabled] { opacity: .6; cursor: progress; }
+  .btn.soft { background: var(--tint); color: var(--accent); border-color: var(--accent); font-size: 15px; }
+  .btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); font-weight: 500; font-size: 15px; }
+  .btn.ghost.armed { border-color: var(--d); color: var(--d); }
+  .msg { margin: 8px 0 0; padding: 12px 14px; border-radius: 6px; font-size: 15px; }
+  .msg.err { background: var(--warn-bg); border-left: 4px solid var(--d); }
+  .msg.ok { background: var(--ok-bg); border-left: 4px solid var(--b); }
+  .msg ul { margin: 6px 0 0; padding-left: 20px; }
+  .msg-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+  .msg-actions .btn { min-height: 44px; padding: 8px 18px; font-size: 15px; }
+  .msg:empty { display: none; }
+  footer { margin: 34px 0 40px; font-size: 13px; color: var(--muted); }
+
+  @media (max-width: 420px) {
+    .wrap { padding: 0 14px; }
+    .opt .txt { font-size: 10.5px; }
+    .crit { padding-left: 12px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="band">
+<header class="wrap head">
+  <div class="titles">
+    <p class="kicker">Revisión del equipo de protección personal</p>
+    <h1>Ficha de revisión</h1>
+    <p class="sub" id="subTitulo">Arneses para trabajo en alturas</p>
+  </div>
+</header>
+</div>
+
+<nav class="strip" aria-label="Avance de la revisión">
+  <div class="wrap">
+    <ol class="cells" id="cells"></ol>
+    <p class="strip-txt"><span id="stripCount">0 de 9 criterios revisados</span><span id="stripFlags"></span></p>
+  </div>
+</nav>
+
+<main class="wrap" id="app"></main>
+
+<footer class="wrap">
+  <p>La revisión detallada debe hacerla una persona competente, con la ficha técnica del fabricante a la mano. Lo que escribes se guarda en este dispositivo mientras trabajas.</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+"use strict";
+
+/* ============================================================
+   CONFIGURACIÓN
+   ============================================================ */
+
+const ESTADOS = [
+  { k: "B",  corto: "Bueno",     largo: "Buen estado" },
+  { k: "V",  corto: "Vigilar",   largo: "Estado a vigilar" },
+  { k: "R",  corto: "Acción",    largo: "Acción a efectuar" },
+  { k: "D",  corto: "Descartar", largo: "No utilizar, desechar" },
+  { k: "NA", corto: "N/A",       largo: "No aplicable" }
+];
+
+// Cada equipo define sus propios campos y criterios. Para agregar otro equipo se añade una entrada aquí.
+const CAMPOS_BASE = [
+  { id: "marca",  label: "Marca / fabricante" },
+  { id: "modelo", label: "Modelo" },
+  { id: "serie",  label: "Número de serie", required: true },
+  { id: "anio",   label: "Año de fabricación", inputmode: "numeric" },
+  { id: "compra", label: "Fecha de compra", type: "date" },
+  { id: "uso1",   label: "Fecha de primer uso", type: "date" }
+];
+
+const EQUIPOS = {
+  arnes: {
+    nombre: "Arneses para trabajo en alturas",
+    menu: "Arnés para trabajo en alturas",
+    slug: "arnes",
+    campos: CAMPOS_BASE,
+    criterios: [
+      { id: "obs", titulo: "Observaciones previas", puntos: [
+        "Número de serie y marcado de certificación presentes y legibles.",
+        "Vida útil del producto no superada.",
+        "Sin modificaciones ni componentes faltantes frente a un equipo nuevo o a la ficha técnica."
+      ]},
+      { id: "cintas", titulo: "Estado de las cintas y costuras", puntos: [
+        "Sin cortes, abrasión, aumento de grosor, quemaduras, rigidez ni contaminación por calor o productos químicos.",
+        "Revisar cintura, perneras, uniones y tirantes, incluidas las zonas ocultas bajo hebillas y puntos de enganche.",
+        "Costuras de seguridad sin hilos sueltos, desgastados o cortados (por ambos lados).",
+        "Puntas de cinta con su dobladillo o remate."
+      ]},
+      { id: "indicadores", titulo: "Indicadores de detención de caída", puntos: [
+        "Indicador visual de caída (por ejemplo, el dorsal) sin activar, si el modelo lo incluye.",
+        "Costuras de la cinta del punto de enganche intactas, si el modelo lo incluye."
+      ]},
+      { id: "enganche", titulo: "Puntos de enganche", puntos: [
+        "Metálicos: sin deformaciones, fisuras, marcas, desgaste ni corrosión.",
+        "Plásticos y textiles: sin cortes, desgaste ni desgarros."
+      ]},
+      { id: "hebillas", titulo: "Hebillas de regulación", puntos: [
+        "Sin deformaciones, fisuras, marcas, desgaste ni corrosión.",
+        "Cintas pasadas correctamente, sin torsiones.",
+        "Funcionamiento correcto de la hebilla."
+      ]},
+      { id: "confort", titulo: "Elementos de confort y portamaterial", puntos: [
+        "Acolchados de cinturón, perneras y tirantes sin cortes, desgaste ni desgarros.",
+        "Elásticos de perneras, trabillas y anillos portamaterial en buen estado."
+      ]},
+      { id: "especificos", titulo: "Componentes específicos del modelo (si aplica)", puntos: [
+        "Puentes de enganche, anillos y otros accesorios sin cortes, deformaciones, fisuras ni corrosión.",
+        "Bandas reflectantes o chaleco de alta visibilidad sin cortes, desgaste ni decoloración.",
+        "Revisar cada componente con la ficha técnica del fabricante."
+      ]}
+    ]
+  },
+  bloqueador: {
+    nombre: "Bloqueador con dientes",
+    menu: "Bloqueador con dientes",
+    slug: "bloqueador",
+    campos: CAMPOS_BASE,
+    criterios: [
+      { id: "obs", titulo: "Observaciones previas", puntos: [
+        "Número de serie y marcado de certificación presentes y legibles.",
+        "Vida útil del producto no superada.",
+        "Sin modificaciones ni componentes faltantes frente a un equipo nuevo o a la ficha técnica."
+      ]},
+      { id: "cuerpo", titulo: "Estado del cuerpo", puntos: [
+        "Cuerpo sin marcas profundas, desgaste, fisuras, deformaciones ni corrosión.",
+        "Orificios de conexión sin marcas, deformaciones, fisuras ni corrosión.",
+        "Sin desgaste excesivo provocado por el paso de la cuerda.",
+        "Dientes completos, con desgaste aceptable y sin suciedad (limpiar con un cepillo si es necesario).",
+        "Testigo de desgaste no visible, en los modelos que lo incluyen."
+      ]},
+      { id: "leva", titulo: "Estado de la leva (si aplica)", puntos: [
+        "Leva sin marcas, deformaciones, fisuras ni corrosión; dientes completos, con desgaste aceptable y sin suciedad (limpiar con un cepillo si es necesario).",
+        "Eje de la leva y remache sin marcas, deformaciones, fisuras ni corrosión.",
+        "La leva gira con libertad y el muelle de retorno la devuelve con eficacia."
+      ]},
+      { id: "tope", titulo: "Tope de seguridad (si aplica)", puntos: [
+        "Tope y su eje sin marcas, deformaciones, fisuras ni corrosión.",
+        "Muelle de retorno del tope eficaz.",
+        "El bloqueo del tope funciona correctamente."
+      ]},
+      { id: "funcional", titulo: "Revisión funcional", puntos: [
+        "El bloqueador se desliza a lo largo de la cuerda en un sentido y bloquea en el sentido contrario."
+      ]}
+    ]
+  },
+  mosqueton: {
+    nombre: "Mosquetones (conectores)",
+    menu: "Mosquetón (conector)",
+    slug: "mosqueton",
+    campos: CAMPOS_BASE,
+    criterios: [
+      { id: "obs", titulo: "Observaciones previas", puntos: [
+        "Número de serie y marcado de certificación presentes y legibles.",
+        "Vida útil del producto no superada.",
+        "Sin modificaciones ni componentes faltantes frente a un equipo nuevo o a la ficha técnica."
+      ]},
+      { id: "cuerpo", titulo: "Estado del cuerpo", puntos: [
+        "Antes de revisar, desplazar cualquier elemento que oculte parte del cuerpo (eslingas, absorbedores de energía, poleas, etc.).",
+        "Cuerpo sin deformaciones, fisuras, marcas, desgaste ni corrosión.",
+        "Sin desgaste por el paso de la cuerda o el roce con anclajes, ni aristas cortantes (los límites de desgaste están en la ficha técnica del fabricante).",
+        "Punta sin deformaciones, fisuras, marcas, desgaste ni corrosión."
+      ]},
+      { id: "gatillo", titulo: "Estado del gatillo (según el modelo)", puntos: [
+        "Gatillo sin deformaciones, fisuras, marcas, desgaste ni corrosión.",
+        "Orificio del sistema de seguridad (por ejemplo, Keylock) limpio, si el modelo lo tiene.",
+        "Remache sin deformaciones, fisuras, marcas, desgaste ni corrosión.",
+        "Apertura manual completa del gatillo.",
+        "Cierre automático correcto: muelle de retorno eficaz y gatillo alineado con la punta."
+      ]},
+      { id: "manual", titulo: "Casquillo de bloqueo manual (si aplica)", puntos: [
+        "Casquillo sin deformaciones, fisuras, marcas, desgaste ni corrosión.",
+        "Recorrido completo al bloquear y desbloquear, y no gira en el vacío en su posición de parada.",
+        "Si es necesario, limpiar con agua y jabón y lubricar ligeramente, según indique el fabricante."
+      ]},
+      { id: "automatico", titulo: "Casquillo de bloqueo automático (si aplica)", puntos: [
+        "Casquillo sin deformaciones, fisuras, marcas, desgaste ni corrosión.",
+        "Sistema de bloqueo funciona según el modo de apertura descrito en la ficha técnica del conector.",
+        "Bloqueo automático completo al soltar el gatillo y el casquillo.",
+        "Si es necesario, limpiar con agua y jabón y lubricar ligeramente, según indique el fabricante."
+      ]},
+      { id: "cierre", titulo: "Sistema de cierre con tornillos (si aplica)", puntos: [
+        "Par de apriete de los tornillos verificado con llave dinamométrica, según la ficha técnica.",
+        "Desmontar los tornillos para revisar cada pieza solo si el estado del equipo lo requiere, siguiendo las instrucciones de montaje del fabricante."
+      ]}
+    ]
+  },
+  polea: {
+    nombre: "Poleas",
+    menu: "Polea",
+    slug: "polea",
+    campos: CAMPOS_BASE,
+    criterios: [
+      { id: "obs", titulo: "Observaciones previas", puntos: [
+        "Número de serie y marcado de certificación presentes y legibles.",
+        "Vida útil del producto no superada.",
+        "Sin modificaciones ni componentes faltantes frente a un equipo nuevo o a la ficha técnica."
+      ]},
+      { id: "placas", titulo: "Estado de las placas laterales", puntos: [
+        "Placas laterales sin marcas, deformaciones, fisuras, desgaste ni corrosión.",
+        "Orificios de conexión sin marcas, deformaciones, fisuras, desgaste ni corrosión.",
+        "En poleas con placas laterales móviles, las placas giran correctamente.",
+        "Remaches sin marcas, deformaciones, fisuras ni corrosión, y sin holgura.",
+        "Eslabón giratorio (si lo tiene) sin marcas, deformaciones, fisuras, desgaste ni corrosión, y gira en los dos sentidos."
+      ]},
+      { id: "roldanas", titulo: "Estado de la roldana o roldanas", puntos: [
+        "Roldana sin marcas, deformaciones, fisuras, desgaste, corrosión ni cuerpos extraños.",
+        "La roldana gira libremente en los dos sentidos.",
+        "Roldana con rueda libre (si aplica): rueda libre en buen estado, la roldana gira en el sentido deseado y bloquea en el contrario, y el número de clics por rotación coincide con la ficha técnica del fabricante."
+      ]},
+      { id: "apertura", titulo: "Sistema de apertura y bloqueo de las placas (si aplica)", puntos: [
+        "Sistema de bloqueo sin marcas, deformaciones ni suciedad.",
+        "Muelles de retorno eficaces y sistema de bloqueo funcionando correctamente."
+      ]},
+      { id: "funcional", titulo: "Revisión funcional", puntos: [
+        "Instalar la polea en un anclaje con una cuerda compatible alrededor de la roldana.",
+        "Hacer circular la cuerda en los dos sentidos."
+      ]}
+    ]
+  },
+  cuerda: {
+    nombre: "Cuerdas",
+    menu: "Cuerda",
+    slug: "cuerda",
+    campos: CAMPOS_BASE.concat([{ id: "longitud", label: "Longitud medida (m)", inputmode: "decimal" }]),
+    criterios: [
+      { id: "obs", titulo: "Observaciones previas", puntos: [
+        "Número de serie y marcado de certificación presentes y legibles.",
+        "Vida útil del producto no superada.",
+        "Sin modificaciones ni componentes faltantes frente a un equipo nuevo o a la ficha técnica."
+      ]},
+      { id: "funda", titulo: "Estado de la funda", puntos: [
+        "Funda revisada en toda la longitud de la cuerda, sin cortes, quemaduras, hilos deshilachados, zonas despeluchadas ni rastros de productos químicos."
+      ]},
+      { id: "alma", titulo: "Estado del alma", puntos: [
+        "Control táctil del alma en toda la longitud de la cuerda para detectar zonas deterioradas: puntos duros, abultamientos, zonas blandas o aplastadas."
+      ]},
+      { id: "terminales", titulo: "Terminales manufacturados (si aplica)", puntos: [
+        "Fundas plásticas sin desgaste ni cortes.",
+        "Terminales cosidos: costuras de seguridad, por encima y por debajo, sin hilos sueltos, desgastados o cortados.",
+        "Terminales injeridos: sin desgaste, especialmente a la altura del punto de conexión, ni hilos sueltos, desgastados o cortados.",
+        "Terminales injeridos: hilo de bloqueo presente (de color contrastado con la cuerda y visible en al menos un punto).",
+        "Terminales injeridos: longitud del orificio de conexión dentro del máximo indicado en la ficha técnica."
+      ]},
+      { id: "longitud", titulo: "Longitud de la cuerda", puntos: [
+        "La longitud de la cuerda corresponde a la que indican las etiquetas."
+      ]}
+    ]
+  },
+  descensor: {
+    nombre: "Descensores autoblocantes",
+    menu: "Descensor autoblocante",
+    slug: "descensor",
+    campos: CAMPOS_BASE,
+    criterios: [
+      { id: "obs", titulo: "Observaciones previas", puntos: [
+        "Número de serie y marcado de certificación presentes y legibles.",
+        "Vida útil del producto no superada.",
+        "Sin modificaciones ni componentes faltantes frente a un equipo nuevo o a la ficha técnica."
+      ]},
+      { id: "placa", titulo: "Estado de la placa lateral móvil", puntos: [
+        "Placa lateral móvil sin marcas, deformaciones, aplastamiento, fisuras ni desgaste.",
+        "Gatillo en buen estado y muelle eficaz.",
+        "Apertura y cierre correctos de la placa, con la holgura y la deformación dentro de lo permitido por la ficha técnica del fabricante.",
+        "Orificio de conexión sin marcas, deformaciones, fisuras ni corrosión.",
+        "Remaches sin marcas, deformaciones, fisuras ni corrosión, y sin holgura."
+      ]},
+      { id: "cuerpo", titulo: "Estado del cuerpo", puntos: [
+        "Leva y su eje sin marcas, deformaciones, suciedad, fisuras ni corrosión; testigo de desgaste sin alcanzar, en los modelos que lo incluyen.",
+        "La leva gira correctamente y, en los modelos que lo requieren, su muelle de retorno es eficaz.",
+        "Patín sin marcas, deformaciones, suciedad ni fisuras.",
+        "Orificio de conexión sin marcas, deformaciones, fisuras ni corrosión.",
+        "Leva indicadora de error (si aplica): sin marcas, deformaciones, fisuras ni corrosión; dientes completos, con desgaste aceptable y sin suciedad (limpiar con un cepillo si es necesario); gira correctamente y su muelle de retorno es eficaz.",
+        "Remaches sin marcas, deformaciones, fisuras ni corrosión, y sin holgura."
+      ]},
+      { id: "empunadura", titulo: "Estado de la empuñadura", puntos: [
+        "Empuñadura sin marcas, deformaciones ni fisuras.",
+        "En los modelos que lo incluyen: todas las posiciones de la empuñadura accesibles y bien marcadas, y botón de desplazamiento horizontal funcionando correctamente.",
+        "Muelle de retorno de la empuñadura funcionando correctamente."
+      ]},
+      { id: "funcional", titulo: "Revisión funcional", puntos: [
+        "Prueba de funcionamiento con los diferentes diámetros de cuerda recomendados.",
+        "Suspenderse a muy poca altura: el aparato debe bloquear la cuerda.",
+        "Accionar la empuñadura para realizar un descenso muy corto."
+      ]}
+    ]
+  },
+  eslinga: {
+    nombre: "Eslingas (protección, posicionamiento y restricción)",
+    menu: "Eslinga (protección, posicionamiento o restricción)",
+    slug: "eslinga",
+    campos: [
+      { id: "tipo", label: "Tipo de eslinga", type: "select", required: true, opciones: ["Protección con absorbedor", "Posicionamiento", "Restricción"] },
+      { id: "terminales", label: "Terminales", type: "select", required: true, opciones: ["Un terminal", "Dos terminales (en Y)"] }
+    ].concat(CAMPOS_BASE),
+    tituloPdf: function (f) {
+      if (!f.e_tipo) return "";
+      return "Eslinga de " + f.e_tipo.toLowerCase() + (f.e_terminales ? ", " + (f.e_terminales === "Un terminal" ? "un terminal" : "dos terminales") : "");
+    },
+    criterios: [
+      { id: "obs", titulo: "Observaciones previas", puntos: [
+        "Número de serie y marcado presentes y legibles.",
+        "Vida útil del producto no superada.",
+        "Sin modificaciones ni componentes faltantes frente a un equipo nuevo o a la ficha técnica."
+      ]},
+      { id: "reatas", titulo: "Estado de las reatas y costuras", puntos: [
+        "Reatas sin cortes, zonas despeluchadas, desgaste ni rastros de productos químicos; en eslingas de dos terminales, revisar ambos ramales.",
+        "Costuras de seguridad, por encima y por debajo, sin hilos sueltos, desgastados o cortados."
+      ]},
+      { id: "absorbedor", titulo: "Estado del absorbedor de energía (si aplica)", puntos: [
+        "Funda del absorbedor sin cortes, zonas despeluchadas, desgaste ni rastros de productos químicos.",
+        "Absorbedor sin señales de haber sufrido un choque: cosido entre las cintas sin desgarro."
+      ]},
+      { id: "ganchoArnes", titulo: "Ganchos de conexión al arnés", puntos: [
+        "Cada gancho abre y cierra sin problema alguno.",
+        "Partes metálicas libres de oxidación y corrosión.",
+        "Disparadores en buenas condiciones."
+      ]},
+      { id: "ganchoEstructural", titulo: "Ganchos de conexión estructural (si aplica)", puntos: [
+        "Cada gancho abre y cierra sin problema alguno.",
+        "Partes metálicas libres de oxidación y corrosión.",
+        "Disparadores en buenas condiciones."
+      ]}
+    ]
+  },
+  casco: {
+    nombre: "Cascos",
+    menu: "Casco",
+    slug: "casco",
+    campos: CAMPOS_BASE,
+    criterios: [
+      { id: "obs", titulo: "Observaciones previas", puntos: [
+        "Número de serie y marcado de certificación presentes y legibles.",
+        "Vida útil del producto no superada.",
+        "Sin modificaciones ni componentes faltantes frente a un equipo nuevo o a la ficha técnica."
+      ]},
+      { id: "carcasa", titulo: "Estado de la carcasa", puntos: [
+        "Exterior sin quemaduras, deformaciones, fisuras, impactos, marcas, rastros de productos químicos ni desgaste.",
+        "Interior sin deformaciones, elementos ausentes, fisuras ni marcas (sin desmontar la almohadilla que está fijada a la carcasa).",
+        "Sin marcado ni personalización hecha con productos químicos (para marcar, usar adhesivos de base acuosa).",
+        "Ranuras y orificios de fijación de accesorios sin deformaciones ni fisuras.",
+        "Cortinillas de ventilación en buen estado y funcionando correctamente, si el modelo las tiene."
+      ]},
+      { id: "almohadilla", titulo: "Estado de la almohadilla", puntos: [
+        "Almohadilla sin deformaciones, fisuras, elementos ausentes, marcas ni desgaste.",
+        "Retirar los elementos de confort para revisar las partes ocultas, sin desmontar la almohadilla fijada a la carcasa."
+      ]},
+      { id: "cofia", titulo: "Estado de la cofia (arnés de soporte en la cabeza, de cinta)", puntos: [
+        "Cintas y fijaciones a la carcasa sin quemaduras, cortes, deformaciones de las piezas plásticas ni desgaste."
+      ]},
+      { id: "contorno", titulo: "Estado del contorno de cabeza", puntos: [
+        "Contorno de cabeza y fijaciones a la carcasa sin deformaciones, elementos ausentes ni desgaste.",
+        "Si es necesario, desplazar acolchados o elementos de confort para revisar las partes ocultas."
+      ]},
+      { id: "regulacion", titulo: "Sistema de regulación", puntos: [
+        "Sistema de regulación y fijaciones a la carcasa sin deformaciones, elementos ausentes ni desgaste.",
+        "Funcionamiento correcto: accionarlo en los dos sentidos y tirar de él para comprobar que no se desajusta."
+      ]},
+      { id: "barboquejo", titulo: "Estado del barboquejo", puntos: [
+        "Cintas y elementos de regulación sin quemaduras, cortes, deformaciones de las piezas plásticas ni desgaste (desplazar trabillas y piezas plásticas para ver las partes ocultas).",
+        "Hebilla de cierre sin deformaciones, fisuras ni desgaste, con cierre fiable (tirar ligeramente de las cintas a cada lado de la hebilla)."
+      ]},
+      { id: "acolchados", titulo: "Acolchados de confort", puntos: [
+        "Acolchados de confort en buen estado; si es necesario, desmontarlos para lavarlos o reemplazarlos."
+      ]},
+      { id: "linternas", titulo: "Ganchos para linternas frontales (si aplica)", puntos: [
+        "Ganchos de fijación sin deformaciones, elementos ausentes ni desgaste."
+      ]},
+      { id: "accesorios", titulo: "Accesorios (si aplica)", puntos: [
+        "Si hay accesorios fijados al casco (pantalla, linterna, etc.), revisar su estado y su correcto funcionamiento."
+      ]}
+    ]
+  },
+  freno: {
+    nombre: "Frenos arrestadores de caída (cuerda o guaya)",
+    menu: "Freno (ASAP o mecánico)",
+    slug: "freno",
+    campos: [
+      { id: "tipo", label: "Tipo de freno", type: "select", required: true, opciones: ["ASAP", "Mecánico"] },
+      { id: "linea", label: "Se usa sobre", type: "select", required: true, opciones: ["Cuerda", "Guaya (cable de acero)"] }
+    ].concat(CAMPOS_BASE),
+    tituloPdf: function (f) {
+      if (!f.e_tipo) return "";
+      return "Freno " + (f.e_tipo === "ASAP" ? "ASAP" : "mecánico") + (f.e_linea ? " para " + (f.e_linea === "Cuerda" ? "cuerda" : "guaya") : "");
+    },
+    criterios: [
+      { id: "obs", titulo: "Observaciones previas", puntos: [
+        "Número de serie y marcado presentes y legibles.",
+        "Vida útil del producto no superada.",
+        "Sin modificaciones ni componentes faltantes frente a un equipo nuevo o a la ficha técnica."
+      ]},
+      { id: "cuerpo", titulo: "Estado del cuerpo", puntos: [
+        "Cuerpo sin marcas, deformaciones, fisuras ni corrosión.",
+        "Bordes del orificio de conexión sin marcas, deformaciones ni fisuras (son indicadores de que el equipo detuvo una caída).",
+        "Tope de detención de la rueda bloqueadora y tapa de protección en buen estado, en los modelos que los incluyen."
+      ]},
+      { id: "rueda", titulo: "Rueda bloqueadora y mecanismo de activación", puntos: [
+        "Rueda bloqueadora sin marcas, deformaciones, fisuras ni corrosión.",
+        "Dientes completos y con desgaste aceptable; parte ranurada en buen estado.",
+        "Rueda sin suciedad: si es necesario, limpiar con un cepillo y, si hace falta, aplicar disolvente con un pincel, sin introducir líquido en el mecanismo.",
+        "La rueda gira de forma uniforme: hacerla girar una vuelta completa en los dos sentidos."
+      ]},
+      { id: "brazo", titulo: "Brazo y tope de seguridad (si aplica)", puntos: [
+        "Brazo sin marcas, deformaciones, fisuras ni corrosión.",
+        "Tope de seguridad sin marcas, deformaciones ni fisuras (son indicadores de detención de una caída).",
+        "Muelle de retorno del brazo eficaz."
+      ]},
+      { id: "deslizamiento", titulo: "Comprobación funcional: deslizamiento por la línea", puntos: [
+        "Instalar el freno en una cuerda o guaya compatible y comprobar que se desliza correctamente en los dos sentidos."
+      ]},
+      { id: "bloqueo", titulo: "Comprobación funcional: bloqueo y desbloqueo", puntos: [
+        "Con el freno instalado en una cuerda o guaya compatible, comprobar que bloquea correctamente al traccionar bruscamente hacia abajo (sentido de una caída).",
+        "Después del bloqueo, comprobar que el desbloqueo se efectúa normalmente."
+      ]},
+      { id: "conector", titulo: "Conector del freno (si aplica)", puntos: [
+        "Revisar el estado del conector con su propia ficha de revisión (ficha de mosquetón)."
+      ]}
+    ]
+  },
+  retractil: {
+    nombre: "Líneas de vida retráctiles (reata o guaya)",
+    menu: "Línea de vida retráctil",
+    slug: "retractil",
+    campos: [
+      { id: "tipo", label: "Tipo de línea", type: "select", required: true, opciones: ["Reata (riata)", "Guaya (cable de acero)"] },
+      { id: "absorbedor", label: "Absorbedor de energía", type: "select", required: true, opciones: ["Con absorbedor", "Sin absorbedor"] }
+    ].concat(CAMPOS_BASE),
+    tituloPdf: function (f) {
+      if (!f.e_tipo) return "";
+      return "Línea de vida retráctil de " + (f.e_tipo.indexOf("Reata") === 0 ? "reata" : "guaya") +
+        (f.e_absorbedor ? (f.e_absorbedor === "Con absorbedor" ? ", con absorbedor" : ", sin absorbedor") : "");
+    },
+    criterios: [
+      { id: "obs", titulo: "Observaciones previas", puntos: [
+        "Número de serie y marcado presentes y legibles.",
+        "Vida útil del producto no superada.",
+        "Sin modificaciones ni componentes faltantes frente a un equipo nuevo o a la ficha técnica."
+      ]},
+      { id: "reata", titulo: "Estado de la reata y costuras (si aplica)", puntos: [
+        "Reata sin cortes, zonas despeluchadas, desgaste ni rastros de productos químicos, en toda su longitud.",
+        "Costuras de seguridad, por encima y por debajo, sin hilos sueltos, desgastados o cortados."
+      ]},
+      { id: "guaya", titulo: "Estado de la guaya (si aplica)", puntos: [
+        "Guaya sin hilos (alambres) rotos, cortes, torceduras, dobleces ni aplastamientos, en toda su longitud.",
+        "Guaya sin desgaste excesivo ni corrosión."
+      ]},
+      { id: "absorbedor", titulo: "Absorbedor de energía (si aplica)", puntos: [
+        "Funda sin cortes, zonas despeluchadas, desgaste ni rastros de productos químicos.",
+        "Absorbedor sin señales de haber sufrido un choque: cosido entre las cintas sin desgarro."
+      ]},
+      { id: "gancho", titulo: "Gancho de conexión", puntos: [
+        "El gancho abre y cierra sin problema alguno.",
+        "Partes metálicas libres de oxidación y corrosión.",
+        "Disparadores en buenas condiciones."
+      ]},
+      { id: "carcasa", titulo: "Carcasa y orificios de conexión", puntos: [
+        "Carcasa y orificios de conexión libres de deformaciones, fisuras, marcas profundas y piezas sueltas."
+      ]}
+    ]
+  },
+  cintaAnclaje: {
+    nombre: "Cintas de anclaje (tie off)",
+    menu: "Cinta de anclaje (tie off)",
+    slug: "cinta-anclaje",
+    campos: CAMPOS_BASE,
+    criterios: [
+      { id: "obs", titulo: "Observaciones previas", puntos: [
+        "Número de serie y marcado presentes y legibles.",
+        "Vida útil del producto no superada.",
+        "Sin modificaciones ni componentes faltantes frente a un equipo nuevo o a la ficha técnica."
+      ]},
+      { id: "cinta", titulo: "Estado de la cinta y costuras", puntos: [
+        "Cinta revisada en toda su longitud, sin cortes, desgaste ni daños por el uso, el calor o los productos químicos; prestar atención a los hilos cortados.",
+        "Costuras de seguridad, por encima y por debajo, sin hilos sueltos, desgastados o cortados."
+      ]},
+      { id: "enganche", titulo: "Puntos de enganche y hebilla de regulación (según el modelo)", puntos: [
+        "Puntos de enganche y hebilla de regulación sin marcas, fisuras, desgaste, deformaciones ni corrosión.",
+        "La hebilla de regulación funciona correctamente."
+      ]}
+    ]
+  },
+  rollgliss: {
+    nombre: "Rollgliss R550",
+    menu: "Rollgliss R550",
+    slug: "rollgliss",
+    campos: CAMPOS_BASE.concat([{ id: "longitud", label: "Longitud de la cuerda (m)", inputmode: "decimal" }]),
+    criterios: [
+      { id: "obs", titulo: "Observaciones previas", puntos: [
+        "Número de serie y marcado presentes y legibles.",
+        "Vida útil del producto no superada.",
+        "Sin modificaciones ni componentes faltantes frente a un equipo nuevo o a la ficha técnica."
+      ]},
+      { id: "anclaje", titulo: "Punto de anclaje y cuerpo del equipo", puntos: [
+        "Punto de anclaje sin deformaciones, corrosión, fisuras ni desgaste que comprometan su resistencia.",
+        "Cuerpo del equipo en buen estado, sin golpes, fisuras, oxidación ni otras alteraciones estructurales."
+      ]},
+      { id: "timon", titulo: "Timón o volante del equipo", puntos: [
+        "El timón funciona correctamente, sin holguras, bloqueos ni daños visibles."
+      ]},
+      { id: "cuerda", titulo: "Cuerda y longitud", puntos: [
+        "Cuerda en óptimas condiciones, sin cortes, desgaste, peladuras, contaminación por sustancias químicas ni deformaciones.",
+        "La longitud de la cuerda corresponde a la especificada por el fabricante y coincide con la registrada en el equipo de origen."
+      ]},
+      { id: "ganchos", titulo: "Ganchos", puntos: [
+        "Cada gancho en buen estado, sin deformaciones, corrosión, fisuras ni fallas en el sistema de cierre automático.",
+        "Sin desgastes ni piezas sueltas.",
+        "Sin marcas profundas ni fisuras."
+      ]}
+    ]
+  }
+};
+const KEY_ULTIMO = "inspeccion:ultimo";
+let EQUIPO_ID = (function () {
+  try { const v = localStorage.getItem(KEY_ULTIMO); if (v && EQUIPOS[v]) return v; } catch (e) { /* sin almacenamiento */ }
+  return Object.keys(EQUIPOS)[0];
+})();
+let EQ = EQUIPOS[EQUIPO_ID];
+
+/* ============================================================
+   ESTADO
+   ============================================================ */
+
+function keyEstado() { return "inspeccion:" + EQUIPO_ID; }
+function keyFotos() { return "inspeccion:" + EQUIPO_ID + ":fotos"; }
+
+function fresh() { return { f: {}, a: {}, v: "", pm: false }; }
+let S = fresh();
+
+const $ = (sel, root) => (root || document).querySelector(sel);
+const app = $("#app");
+
+function pad(n) { return String(n).padStart(2, "0"); }
+function todayISO() { const d = new Date(); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+function plus12m(iso) {
+  const p = iso.split("-").map(Number);
+  if (p.length !== 3 || p.some(isNaN)) return "";
+  const t = new Date(p[0] + 1, p[1] - 1, p[2]);
+  if (t.getMonth() !== p[1] - 1) t.setDate(0);
+  return t.getFullYear() + "-" + pad(t.getMonth() + 1) + "-" + pad(t.getDate());
+}
+function fmtDate(iso) {
+  if (!iso) return "";
+  const p = iso.split("-");
+  return p.length === 3 ? p[2] + "/" + p[1] + "/" + p[0] : iso;
+}
+
+let saveTimer = null;
+function queueSave() { clearTimeout(saveTimer); saveTimer = setTimeout(saveNow, 300); }
+function saveNow() {
+  try { localStorage.setItem(keyEstado(), JSON.stringify(S)); } catch (e) { /* sin almacenamiento: se sigue trabajando en memoria */ }
+}
+function loadState() {
+  try {
+    const raw = localStorage.getItem(keyEstado());
+    if (!raw) return;
+    const o = JSON.parse(raw);
+    if (o && typeof o === "object") {
+      S = { f: o.f || {}, a: o.a || {}, v: o.v || "", pm: !!o.pm };
+    }
+  } catch (e) { S = fresh(); }
+}
+
+/* ============================================================
+   FOTOS DEL ESTADO DEL EQUIPO
+   ============================================================ */
+
+const MAX_FOTOS = 6;
+let photos = []; // { id, data, w, h, cap }
+let photoStoreFail = false;
+let photoTimer = null;
+
+function queuePhotoSave() { clearTimeout(photoTimer); photoTimer = setTimeout(savePhotos, 400); }
+function savePhotos() {
+  try {
+    if (photos.length) localStorage.setItem(keyFotos(), JSON.stringify(photos));
+    else localStorage.removeItem(keyFotos());
+    photoStoreFail = false;
+  } catch (e) { photoStoreFail = true; }
+  updatePhotoNote();
+}
+function loadPhotos() {
+  try {
+    const raw = localStorage.getItem(keyFotos());
+    if (!raw) return;
+    const arr = JSON.parse(raw);
+    if (Array.isArray(arr)) {
+      photos = arr.filter(function (p) { return p && typeof p.data === "string" && p.data.indexOf("data:image") === 0 && p.w > 0 && p.h > 0; })
+        .map(function (p) { return { id: String(p.id), data: p.data, w: p.w, h: p.h, cap: String(p.cap || "") }; })
+        .slice(0, MAX_FOTOS);
+    }
+  } catch (e) { photos = []; }
+}
+function readPhoto(file) {
+  return new Promise(function (res) {
+    const fr = new FileReader();
+    fr.onerror = function () { res(null); };
+    fr.onload = function () {
+      const im = new Image();
+      im.onerror = function () { res(null); };
+      im.onload = function () {
+        const r = Math.min(1, 1100 / Math.max(im.naturalWidth, im.naturalHeight));
+        const c = document.createElement("canvas");
+        c.width = Math.max(1, Math.round(im.naturalWidth * r));
+        c.height = Math.max(1, Math.round(im.naturalHeight * r));
+        const ctx = c.getContext("2d");
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fillRect(0, 0, c.width, c.height);
+        ctx.drawImage(im, 0, 0, c.width, c.height);
+        res({ id: "p" + Date.now() + Math.random().toString(36).slice(2, 6), data: c.toDataURL("image/jpeg", 0.78), w: c.width, h: c.height, cap: "" });
+      };
+      im.src = fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+async function addPhotos(files) {
+  const room = Math.max(0, MAX_FOTOS - photos.length);
+  const list = files.filter(function (f) { return /^image\//.test(f.type); }).slice(0, room);
+  for (let i = 0; i < list.length; i++) {
+    const p = await readPhoto(list[i]);
+    if (p) photos.push(p);
+  }
+  savePhotos();
+  paintPhotos();
+}
+function paintPhotos() {
+  const box = $("#photos");
+  if (!box) return;
+  box.innerHTML = photos.map(function (p, i) {
+    return '<figure class="ph"><div class="thumb"><img alt="Foto ' + (i + 1) + ' del estado del equipo" src="' + p.data + '">' +
+      '<button type="button" class="ph-rm" data-rm="' + p.id + '" aria-label="Quitar la foto ' + (i + 1) + '">Quitar</button></div>' +
+      '<input type="text" class="ph-cap" data-cap="' + p.id + '" maxlength="80" autocomplete="off" placeholder="Descripción (opcional)" aria-label="Descripción de la foto ' + (i + 1) + '"></figure>';
+  }).join("");
+  box.querySelectorAll("[data-cap]").forEach(function (el) {
+    const p = photos.find(function (x) { return x.id === el.dataset.cap; });
+    el.value = p ? p.cap : "";
+  });
+  updatePhotoNote();
+}
+function updatePhotoNote() {
+  const n = $("#photoNote"), b = $("#btnPhoto");
+  if (!n || !b) return;
+  const flags = EQ.criterios.filter(function (c) { return ["V", "R", "D"].indexOf(S.a[c.id]) >= 0; }).length;
+  b.disabled = photos.length >= MAX_FOTOS;
+  let t;
+  if (photos.length >= MAX_FOTOS) t = "Llegaste al máximo de " + MAX_FOTOS + " fotos.";
+  else if (flags && !photos.length) t = "Tienes hallazgos marcados: una foto del defecto ayuda a documentarlos.";
+  else t = "Hasta " + MAX_FOTOS + " fotos. Se incluyen en el PDF.";
+  if (photoStoreFail) t += " No se pudieron guardar en este dispositivo; se mantienen mientras no cierres la página.";
+  n.textContent = t;
+}
+
+/* ============================================================
+   INTERFAZ
+   ============================================================ */
+
+function fieldHTML(id, label, type, extra, opciones) {
+  type = type || "text";
+  if (type === "select") {
+    const ops = '<option value="">Selecciona una opción</option>' + (opciones || []).map(function (o) {
+      return '<option value="' + o + '">' + o + "</option>";
+    }).join("");
+    return '<label class="f"><span class="lbl">' + label + '</span><select id="' + id + '" data-f="' + id + '"' + (extra || "") + ">" + ops + "</select></label>";
+  }
+  const attrs = type === "text" ? ' autocomplete="off" maxlength="80"' : "";
+  return '<label class="f"><span class="lbl">' + label + '</span><input id="' + id + '" data-f="' + id + '" type="' + type + '"' + attrs + (extra || "") + "></label>";
+}
+
+function critHTML(c, i) {
+  const n = i + 2;
+  const opts = ESTADOS.map(function (e) {
+    return '<label class="opt opt-' + e.k + '">' +
+      '<input type="radio" name="c-' + c.id + '" value="' + e.k + '" data-a="' + c.id + '" aria-label="' + n + ". " + c.titulo + ": " + e.largo + '">' +
+      '<span class="box"><span class="code">' + (e.k === "NA" ? "N/A" : e.k) + '</span><span class="txt">' + e.corto + "</span></span></label>";
+  }).join("");
+  return '<section class="crit" id="crit-' + c.id + '" aria-labelledby="h-' + c.id + '" data-state="">' +
+    '<h3 id="h-' + c.id + '">' + n + ". " + c.titulo + "</h3>" +
+    '<ul class="pts">' + c.puntos.map(function (p) { return "<li>" + p + "</li>"; }).join("") + "</ul>" +
+    '<div class="opts" role="radiogroup" aria-label="Resultado del criterio ' + n + '">' + opts + "</div></section>";
+}
+
+function render() {
+  $("#subTitulo").textContent = EQ.nombre;
+  document.title = "Ficha de revisión - " + EQ.nombre;
+
+  const legend = '<dl class="legend">' + ESTADOS.map(function (e) {
+    return '<div><dt class="k-' + e.k + '">' + (e.k === "NA" ? "N/A" : e.k) + "</dt><dd>" + e.largo + "</dd></div>";
+  }).join("") + "</dl>";
+
+  const campos = EQ.campos.map(function (c) {
+    const extra = (c.inputmode ? ' inputmode="' + c.inputmode + '"' : "") + (c.required ? " required" : "");
+    return fieldHTML("e_" + c.id, c.label + (c.required ? " (obligatorio)" : ""), c.type || "text", extra, c.opciones);
+  }).join("");
+
+  const opciones = Object.keys(EQUIPOS).map(function (k) {
+    return '<option value="' + k + '"' + (k === EQUIPO_ID ? ' selected' : '') + '>' + EQUIPOS[k].menu + '</option>';
+  }).join("");
+
+  app.innerHTML =
+    '<label class="f selector"><span class="lbl">Tipo de equipo a inspeccionar</span><select id="equipoSel">' + opciones + '</select></label>' +
+    '<h2 class="first">Identificación</h2>' +
+    '<p class="sub-h">Usuario del equipo</p>' +
+    '<div class="grid">' +
+      fieldHTML("u_nombre", "Nombre y apellidos") +
+      fieldHTML("u_empresa", "Empresa") +
+      fieldHTML("u_id", "Identificador (documento o código interno)") +
+    "</div>" +
+    '<p class="sub-h">Equipo</p>' +
+    '<div class="grid">' + campos + "</div>" +
+
+    "<h2>1. Antecedentes conocidos del equipo</h2>" +
+    '<label class="f"><span class="lbl">Condiciones de uso o eventos excepcionales: caída o detención de una caída, uso o almacenamiento a temperaturas extremas, modificaciones no autorizadas.</span>' +
+    '<textarea id="antecedentes" data-f="antecedentes" maxlength="600"></textarea></label>' +
+
+    "<h2>Criterios de revisión</h2>" + legend +
+    EQ.criterios.map(critHTML).join("") +
+
+    "<h2>Observaciones generales</h2>" +
+    '<label class="f"><span class="lbl" id="comLbl">Detalla los defectos encontrados y las acciones realizadas.</span>' +
+    '<textarea id="comentarios" data-f="comentarios" maxlength="1000"></textarea></label>' +
+    '<p class="sub-h">Fotos del estado del equipo</p>' +
+    '<div class="photos" id="photos"></div>' +
+    '<div class="photo-actions"><button type="button" class="btn soft" id="btnPhoto">Agregar foto</button><p class="note" id="photoNote"></p></div>' +
+    '<input type="file" id="photoFile" accept="image/*" multiple hidden>' +
+
+    "<h2>Veredicto</h2>" +
+    '<fieldset class="verd" id="veredicto" tabindex="-1"><legend class="lbl" style="position:absolute;left:-9999px">Veredicto</legend>' +
+      '<label class="v-apto"><input type="radio" name="veredicto" value="apto"><span>Equipo <strong>apto</strong> para ser utilizado</span></label>' +
+      '<label class="v-no"><input type="radio" name="veredicto" value="no_apto"><span>Equipo <strong>no apto</strong> para ser utilizado</span></label>' +
+    "</fieldset>" +
+    '<p class="verd-hint" id="verdHint" role="status" hidden></p>' +
+
+    "<h2>Datos de la revisión</h2>" +
+    '<div class="grid">' +
+      fieldHTML("r_nombre", "Revisado por") +
+      fieldHTML("r_empresa", "Empresa") +
+      fieldHTML("r_fecha", "Fecha de la revisión", "date") +
+      '<label class="f"><span class="lbl">Fecha de la próxima revisión</span><input id="r_proxima" data-f="r_proxima" type="date"><span class="hint">Se sugiere a 12 meses. Ajústala según tu procedimiento.</span></label>' +
+    "</div>" +
+
+    '<div class="actions">' +
+      '<button type="button" class="btn" id="btnPdf">Generar PDF</button>' +
+      '<button type="button" class="btn ghost" id="btnClear">Borrar formulario</button>' +
+    "</div>" +
+    '<div id="msg" class="msg" role="alert" tabindex="-1"></div>';
+
+  // franja de avance
+  $("#cells").style.gridTemplateColumns = "repeat(" + EQ.criterios.length + ", minmax(0, 1fr))";
+  $("#cells").innerHTML = EQ.criterios.map(function (c, i) {
+    return '<li><a class="cell" href="#crit-' + c.id + '" data-c="' + c.id + '" data-state="" aria-label="Criterio ' + (i + 2) + ': ' + c.titulo + '">' + (i + 2) + "</a></li>";
+  }).join("");
+
+  hydrate();
+}
+
+function hydrate() {
+  if (!S.f.r_fecha) S.f.r_fecha = todayISO();
+  if (!S.pm && !S.f.r_proxima) S.f.r_proxima = plus12m(S.f.r_fecha);
+
+  app.querySelectorAll("[data-f]").forEach(function (el) { el.value = S.f[el.dataset.f] || ""; });
+  app.querySelectorAll("input[data-a]").forEach(function (el) { el.checked = S.a[el.dataset.a] === el.value; });
+  app.querySelectorAll('input[name="veredicto"]').forEach(function (el) { el.checked = S.v === el.value; });
+  EQ.criterios.forEach(function (c) { syncCrit(c.id); });
+  paintPhotos();
+  updateProgress();
+}
+
+function syncCrit(id) {
+  const st = S.a[id] || "";
+  const sec = $("#crit-" + id);
+  if (sec) sec.dataset.state = st;
+  const cell = $('.cell[data-c="' + id + '"]');
+  if (cell) cell.dataset.state = st;
+}
+
+function updateProgress() {
+  const total = EQ.criterios.length;
+  const done = EQ.criterios.filter(function (c) { return S.a[c.id]; }).length;
+  const flags = EQ.criterios.filter(function (c) { return ["V", "R", "D"].indexOf(S.a[c.id]) >= 0; }).length;
+  $("#stripCount").textContent = done + " de " + total + " criterios revisados";
+  $("#stripFlags").textContent = flags ? "Con hallazgos: " + flags : "";
+  const lbl = $("#comLbl");
+  if (lbl) lbl.textContent = flags
+    ? "Detalla los defectos encontrados y las acciones realizadas. Tienes " + flags + (flags === 1 ? " criterio" : " criterios") + " con hallazgos (V, R o D)."
+    : "Detalla los defectos encontrados y las acciones realizadas.";
+  updateVerdictHint();
+  updatePhotoNote();
+}
+
+function hasD() { return EQ.criterios.some(function (c) { return S.a[c.id] === "D"; }); }
+function updateVerdictHint() {
+  const h = $("#verdHint");
+  if (!h) return;
+  if (hasD() && S.v !== "no_apto") {
+    h.hidden = false;
+    h.textContent = "Hay criterios marcados como “No utilizar, desechar”. El veredicto debe ser: equipo no apto para ser utilizado.";
+  } else {
+    h.hidden = true;
+    h.textContent = "";
+  }
+}
+
+/* Eventos */
+app.addEventListener("input", function (e) {
+  const t = e.target;
+  if (t.dataset && t.dataset.cap) {
+    const ph = photos.find(function (x) { return x.id === t.dataset.cap; });
+    if (ph) { ph.cap = t.value; queuePhotoSave(); }
+    return;
+  }
+  if (!t.dataset || !t.dataset.f) return;
+  S.f[t.dataset.f] = t.value;
+  if (t.id === "r_fecha" && !S.pm) {
+    const nx = t.value ? plus12m(t.value) : "";
+    S.f.r_proxima = nx;
+    $("#r_proxima").value = nx;
+  }
+  if (t.id === "r_proxima") S.pm = true;
+  queueSave();
+});
+app.addEventListener("change", function (e) {
+  const t = e.target;
+  if (t.id === "equipoSel") {
+    cambiarEquipo(t.value);
+    return;
+  }
+  if (t.id === "photoFile") {
+    const fl = Array.from(t.files || []);
+    t.value = "";
+    addPhotos(fl);
+    return;
+  }
+  if (t.dataset && t.dataset.a) {
+    S.a[t.dataset.a] = t.value;
+    syncCrit(t.dataset.a);
+    updateProgress();
+    queueSave();
+  } else if (t.name === "veredicto") {
+    S.v = t.value;
+    updateVerdictHint();
+    queueSave();
+  } else if (t.tagName === "SELECT" && t.dataset && t.dataset.f) {
+    S.f[t.dataset.f] = t.value;
+    queueSave();
+  }
+});
+app.addEventListener("click", function (e) {
+  const b = e.target.closest("button");
+  if (!b) return;
+  if (b.id === "btnPdf") onGenerate();
+  if (b.id === "btnClear") onClear(b);
+  if (b.id === "btnPhoto") $("#photoFile").click();
+  if (b.dataset && b.dataset.pdf && lastPdf) {
+    if (b.dataset.pdf === "download") lastPdf.doc.save(lastPdf.name);
+    else compartirPdf();
+  }
+  if (b.dataset && b.dataset.rm) {
+    photos = photos.filter(function (p) { return p.id !== b.dataset.rm; });
+    savePhotos();
+    paintPhotos();
+  }
+});
+
+function cambiarEquipo(id) {
+  if (!EQUIPOS[id] || id === EQUIPO_ID) return;
+  clearTimeout(saveTimer); saveNow();
+  clearTimeout(photoTimer); savePhotos();
+  EQUIPO_ID = id;
+  EQ = EQUIPOS[id];
+  try { localStorage.setItem(KEY_ULTIMO, id); } catch (e) { /* sin almacenamiento */ }
+  S = fresh();
+  photos = [];
+  photoStoreFail = false;
+  loadState();
+  loadPhotos();
+  render();
+  window.scrollTo({ top: 0 });
+}
+
+let armTimer = null;
+function onClear(btn) {
+  if (!btn.classList.contains("armed")) {
+    btn.classList.add("armed");
+    btn.textContent = "Toca otra vez para borrar todo";
+    clearTimeout(armTimer);
+    armTimer = setTimeout(function () { btn.classList.remove("armed"); btn.textContent = "Borrar formulario"; }, 4000);
+    return;
+  }
+  clearTimeout(armTimer);
+  S = fresh();
+  photos = [];
+  savePhotos();
+  saveNow();
+  render();
+  window.scrollTo({ top: 0 });
+}
+
+/* ============================================================
+   VALIDACIÓN
+   ============================================================ */
+
+function validate() {
+  const errs = [];
+  EQ.campos.forEach(function (c) {
+    if (c.required && !(S.f["e_" + c.id] || "").trim()) errs.push({ msg: "Falta completar: " + c.label + ".", target: "e_" + c.id });
+  });
+  const falt = [];
+  EQ.criterios.forEach(function (c, i) { if (!S.a[c.id]) falt.push({ n: i + 2, id: c.id }); });
+  if (falt.length) errs.push({ msg: "Faltan criterios por marcar: " + falt.map(function (x) { return x.n; }).join(", ") + ".", target: "crit-" + falt[0].id });
+  if (!S.v) errs.push({ msg: "Selecciona el veredicto.", target: "veredicto" });
+  else if (S.v === "apto" && hasD()) errs.push({ msg: "Hay criterios marcados como “No utilizar, desechar”; el veredicto no puede ser “apto”.", target: "veredicto" });
+  if (!(S.f.r_nombre || "").trim()) errs.push({ msg: "Falta el nombre de quien realiza la revisión.", target: "r_nombre" });
+  return errs;
+}
+
+function showMsg(kind, html) {
+  const m = $("#msg");
+  m.className = "msg " + kind;
+  m.innerHTML = html;
+}
+
+/* ============================================================
+   PDF
+   ============================================================ */
+
+function buildPdf() {
+  const jsPDF = window.jspdf.jsPDF;
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+  const PW = 210, PH = 297, M = 12, W = PW - 2 * M, BOTTOM = PH - 16;
+  const INK = [21, 34, 56], MUTED = [82, 98, 122], LINE = [196, 206, 222], SOFT = [227, 234, 245], ACC = [27, 58, 107], RING = [150, 162, 180], BAND = [22, 50, 92], BANDSUB = [185, 207, 240];
+  const COLOR = { B: [53, 128, 58], V: [148, 96, 15], R: [184, 74, 22], D: [179, 38, 30], NA: [95, 107, 117] };
+  const COL = 11, TBL = COL * 5, TXTW = W - TBL - 4, X0 = M + W - TBL;
+  let y = M, tableOpen = false;
+
+  function txt(t, x, yy, o) {
+    o = o || {};
+    doc.setFont("helvetica", o.bold ? "bold" : "normal");
+    doc.setFontSize(o.size || 8);
+    const c = o.color || INK;
+    doc.setTextColor(c[0], c[1], c[2]);
+    doc.text(String(t), x, yy, { align: o.align || "left" });
+  }
+  function wrap(t, w, size, bold) {
+    doc.setFont("helvetica", bold ? "bold" : "normal");
+    doc.setFontSize(size);
+    return doc.splitTextToSize(String(t || ""), w);
+  }
+  function fit(t, maxW, size, bold) {
+    doc.setFont("helvetica", bold ? "bold" : "normal");
+    doc.setFontSize(size);
+    t = String(t || "");
+    if (doc.getTextWidth(t) <= maxW) return t;
+    while (t.length > 1 && doc.getTextWidth(t + "...") > maxW) t = t.slice(0, -1);
+    return t + "...";
+  }
+  function stroke(c, w) { doc.setDrawColor(c[0], c[1], c[2]); doc.setLineWidth(w); }
+  function fill(c) { doc.setFillColor(c[0], c[1], c[2]); }
+
+  function firstHeader() {
+    fill(BAND);
+    doc.rect(0, 0, PW, M + 20, "F");
+    txt("Revisión del equipo de protección personal", M, M + 5, { size: 8, color: BANDSUB });
+    txt("Ficha de revisión", M, M + 13, { size: 19, color: [255, 255, 255] });
+    const ttl = (EQ.tituloPdf ? EQ.tituloPdf(S.f) : "") || EQ.nombre;
+    txt(fit(ttl, W - 62, 10.5, true), M + W, M + 13, { size: 10.5, bold: true, color: BANDSUB, align: "right" });
+    y = M + 28;
+  }
+  function contHeader() {
+    const serie = S.f.e_serie ? " - Serie " + S.f.e_serie : "";
+    txt(fit("Ficha de revisión - " + EQ.nombre + serie, W, 7.5), M, M + 3, { size: 7.5, color: MUTED });
+    stroke(LINE, 0.3);
+    doc.line(M, M + 5, M + W, M + 5);
+    y = M + 9;
+  }
+  function tableHeader() {
+    fill(SOFT);
+    doc.rect(M, y, W, 6, "F");
+    txt("Criterios", M + 2, y + 4.1, { size: 7.5, bold: true, color: MUTED });
+    ESTADOS.forEach(function (e, k) {
+      txt(e.k === "NA" ? "N/A" : e.k, X0 + k * COL + COL / 2, y + 4.1, { size: 7.5, bold: true, align: "center" });
+    });
+    y += 6;
+  }
+  function ensure(h) {
+    if (y + h > BOTTOM) {
+      doc.addPage();
+      contHeader();
+      if (tableOpen) tableHeader();
+    }
+  }
+
+  function identBlock() {
+    const cw = (W - 8) / 2;
+    const left = [
+      ["Nombre y apellidos", S.f.u_nombre],
+      ["Empresa", S.f.u_empresa],
+      ["Identificador", S.f.u_id]
+    ];
+    const right = EQ.campos.map(function (c) {
+      const v = S.f["e_" + c.id];
+      return [c.label, c.type === "date" ? fmtDate(v) : v];
+    });
+    function drawCol(x, title, rows) {
+      txt(title, x, y, { size: 8.5, bold: true, color: ACC });
+      stroke(ACC, 0.4);
+      doc.line(x, y + 1.5, x + cw, y + 1.5);
+      let yy = y + 7;
+      rows.forEach(function (r) {
+        txt(r[0], x, yy, { size: 7.5, color: MUTED });
+        const vx = x + 34;
+        stroke(LINE, 0.2);
+        doc.line(vx - 1, yy + 1.2, x + cw, yy + 1.2);
+        txt(fit(r[1], cw - 36, 8.5), vx, yy, { size: 8.5 });
+        yy += 6.4;
+      });
+      return yy;
+    }
+    const yl = drawCol(M, "Identificación del usuario", left);
+    const yr = drawCol(M + cw + 8, "Identificación del equipo", right);
+    y = Math.max(yl, yr) + 1;
+  }
+
+  function legend() {
+    fill(SOFT);
+    doc.rect(M, y, W, 8, "F");
+    const iw = W / ESTADOS.length;
+    ESTADOS.forEach(function (e, i) {
+      const cx = M + i * iw + 4;
+      fill(COLOR[e.k]);
+      doc.circle(cx, y + 4, 1.4, "F");
+      const code = e.k === "NA" ? "N/A" : e.k;
+      txt(code, cx + 3, y + 5.1, { size: 7.5, bold: true });
+      txt(e.largo, cx + 3 + (e.k === "NA" ? 6 : 4), y + 5.1, { size: 6.6, color: MUTED });
+    });
+    y += 12;
+  }
+
+  function antecedentes() {
+    const help = "Condiciones de uso o eventos excepcionales durante la utilización (por ejemplo: caída o detención de una caída, uso o almacenamiento a temperaturas extremas, modificación no autorizada).";
+    const hl = wrap(help, W, 6.8, false);
+    const val = (S.f.antecedentes || "").trim();
+    const vl = val ? wrap(val, W - 4, 8, false) : [];
+    const boxH = Math.max(12, vl.length * 3.6 + 5);
+    ensure(5 + hl.length * 2.9 + boxH + 6);
+    txt("1. Antecedentes conocidos del equipo", M, y + 3, { size: 8.5, bold: true });
+    let yy = y + 6.5;
+    hl.forEach(function (l) { txt(l, M, yy, { size: 6.8, color: MUTED }); yy += 2.9; });
+    yy += 0.5;
+    stroke(LINE, 0.3);
+    doc.rect(M, yy, W, boxH);
+    vl.forEach(function (l, i) { txt(l, M + 2, yy + 4.6 + i * 3.6, { size: 8 }); });
+    y = yy + boxH + 5;
+  }
+
+  function criterios() {
+    tableOpen = true;
+    ensure(6 + 14);
+    tableHeader();
+    EQ.criterios.forEach(function (c, i) {
+      const n = i + 2;
+      const groups = c.puntos.map(function (p) { return wrap(p, TXTW - 4, 6.8, false); });
+      const nl = groups.reduce(function (a, g) { return a + g.length; }, 0);
+      const h = Math.max(11, 6.7 + nl * 2.9);
+      ensure(h);
+      stroke(LINE, 0.2);
+      doc.line(M, y, M + W, y);
+      txt(n + ". " + c.titulo, M + 1, y + 4, { size: 8, bold: true });
+      let yy = y + 7.4;
+      groups.forEach(function (g) {
+        fill(MUTED);
+        doc.circle(M + 2, yy - 0.8, 0.35, "F");
+        g.forEach(function (l) { txt(l, M + 4, yy, { size: 6.8, color: [60, 72, 82] }); yy += 2.9; });
+      });
+      const cy = y + h / 2;
+      ESTADOS.forEach(function (e, k) {
+        const cx = X0 + k * COL + COL / 2;
+        if (S.a[c.id] === e.k) {
+          fill(COLOR[e.k]); stroke(COLOR[e.k], 0.3);
+          doc.circle(cx, cy, 1.9, "FD");
+        } else {
+          stroke(RING, 0.3);
+          doc.circle(cx, cy, 1.9, "S");
+        }
+      });
+      y += h;
+    });
+    stroke(LINE, 0.2);
+    doc.line(M, y, M + W, y);
+    y += 5;
+    tableOpen = false;
+  }
+
+  function comentarios() {
+    const val = (S.f.comentarios || "").trim();
+    const vl = val ? wrap(val, W - 4, 8, false) : [];
+    const boxH = Math.max(22, vl.length * 3.6 + 5);
+    ensure(5 + boxH + 5);
+    txt("Observaciones generales (detalle de los defectos encontrados y las acciones realizadas)", M, y + 3, { size: 8.5, bold: true });
+    y += 5;
+    stroke(LINE, 0.3);
+    doc.rect(M, y, W, boxH);
+    vl.forEach(function (l, i) { txt(l, M + 2, y + 4.6 + i * 3.6, { size: 8 }); });
+    y += boxH + 5;
+  }
+
+  function fotos() {
+    if (!photos.length) return;
+    const cols = 3, gap = 4, cw = (W - gap * (cols - 1)) / cols, ih = 44, capH = 8;
+    ensure(6 + ih + capH + 3);
+    txt("Registro fotográfico del estado del equipo", M, y + 3, { size: 8.5, bold: true });
+    y += 6;
+    const rows = Math.ceil(photos.length / cols);
+    for (let r = 0; r < rows; r++) {
+      ensure(ih + capH + 3);
+      for (let c = 0; c < cols; c++) {
+        const idx = r * cols + c;
+        const p = photos[idx];
+        if (!p) break;
+        const x = M + c * (cw + gap);
+        stroke(LINE, 0.3);
+        doc.rect(x, y, cw, ih);
+        const k = Math.min((cw - 2) / p.w, (ih - 2) / p.h), pw = p.w * k, ph = p.h * k;
+        doc.addImage(p.data, "JPEG", x + (cw - pw) / 2, y + (ih - ph) / 2, pw, ph);
+        const ls = wrap("Foto " + (idx + 1) + (p.cap ? ": " + p.cap : ""), cw, 7, false).slice(0, 2);
+        ls.forEach(function (l, j) { txt(l, x, y + ih + 3.4 + j * 3, { size: 7, color: MUTED }); });
+      }
+      y += ih + capH + 3;
+    }
+    y += 2;
+  }
+
+  function veredicto() {
+    ensure(38);
+    const lw = 84;
+    fill(ACC);
+    doc.rect(M, y, lw, 7, "F");
+    txt("Veredicto", M + 3, y + 4.8, { size: 8.5, bold: true, color: [255, 255, 255] });
+    const rows = [
+      ["apto", "Equipo apto para ser utilizado", COLOR.B],
+      ["no_apto", "Equipo no apto para ser utilizado", COLOR.D]
+    ];
+    rows.forEach(function (r, i) {
+      const ry = y + 7 + i * 9;
+      stroke(LINE, 0.3);
+      doc.rect(M, ry, lw, 9);
+      const sel = S.v === r[0];
+      if (sel) { fill(r[2]); stroke(r[2], 0.3); doc.circle(M + 5, ry + 4.5, 2, "FD"); }
+      else { stroke(RING, 0.3); doc.circle(M + 5, ry + 4.5, 2, "S"); }
+      txt(r[1], M + 10, ry + 5.6, { size: 8.5, bold: sel });
+    });
+
+    const rx = M + lw + 6, rw = W - lw - 6;
+    const items = [
+      ["Revisado por", S.f.r_nombre],
+      ["Empresa", S.f.r_empresa],
+      ["Fecha", fmtDate(S.f.r_fecha)],
+      ["Próxima revisión", fmtDate(S.f.r_proxima)],
+      ["Firma", ""]
+    ];
+    let yy = y + 4.5;
+    items.forEach(function (it) {
+      txt(it[0], rx, yy, { size: 7.5, color: MUTED });
+      const vx = rx + 30;
+      stroke(LINE, 0.2);
+      doc.line(vx - 1, yy + 1.2, rx + rw, yy + 1.2);
+      txt(fit(it[1], rw - 32, 8.5), vx, yy, { size: 8.5 });
+      yy += 6.4;
+    });
+    y += 36;
+  }
+
+  firstHeader();
+  identBlock();
+  legend();
+  antecedentes();
+  criterios();
+  comentarios();
+  fotos();
+  veredicto();
+
+  const n = doc.getNumberOfPages();
+  for (let i = 1; i <= n; i++) {
+    doc.setPage(i);
+    stroke(LINE, 0.3);
+    doc.line(M, PH - 11, M + W, PH - 11);
+    txt("Ficha de revisión - " + EQ.nombre, M, PH - 7, { size: 7, color: MUTED });
+    txt("Página " + i + " de " + n, M + W, PH - 7, { size: 7, color: MUTED, align: "right" });
+  }
+  return doc;
+}
+
+function fileName() {
+  const clean = function (s) { return String(s || "").trim().replace(/[^A-Za-z0-9_-]+/g, "-").replace(/^-+|-+$/g, ""); };
+  return "Revision-" + EQ.slug + "_" + (clean(S.f.e_serie) || "sin-serie") + "_" + (S.f.r_fecha || todayISO()) + ".pdf";
+}
+
+let lastPdf = null;
+
+function puedeCompartir() {
+  try {
+    return !!(lastPdf && navigator.canShare && window.matchMedia && matchMedia("(pointer: coarse)").matches &&
+      navigator.canShare({ files: [lastPdf.file] }));
+  } catch (e) { return false; }
+}
+async function compartirPdf() {
+  if (!puedeCompartir()) return "no";
+  try {
+    await navigator.share({ files: [lastPdf.file], title: lastPdf.name });
+    return "listo";
+  } catch (e) {
+    return e && e.name === "AbortError" ? "cancelado" : "no";
+  }
+}
+function mostrarListo(name, estado) {
+  const texto = estado === "cancelado"
+    ? "No se compartió el PDF. Puedes compartirlo o descargarlo desde aquí."
+    : "PDF listo: <strong>" + name + "</strong>";
+  const botones = (puedeCompartir() ? '<button type="button" class="btn ghost" data-pdf="share">Compartir</button>' : "") +
+    '<button type="button" class="btn ghost" data-pdf="download">Descargar</button>';
+  showMsg("ok", texto + '<div class="msg-actions">' + botones + "</div>");
+}
+
+async function onGenerate() {
+  const errs = validate();
+  if (errs.length) {
+    showMsg("err", "<strong>Antes de generar el PDF, completa lo siguiente:</strong><ul>" + errs.map(function (e) { return "<li>" + e.msg + "</li>"; }).join("") + "</ul>");
+    const first = document.getElementById(errs[0].target);
+    if (first) {
+      first.scrollIntoView({ block: "center" });
+      if (first.focus) { try { first.focus({ preventScroll: true }); } catch (e) { /* sin foco */ } }
+    }
+    return;
+  }
+  if (!window.jspdf || !window.jspdf.jsPDF) {
+    showMsg("err", "No se pudo cargar el generador de PDF. Revisa tu conexión y recarga la página.");
+    return;
+  }
+  const btn = $("#btnPdf");
+  btn.disabled = true;
+  try {
+    const doc = buildPdf();
+    const name = fileName();
+    const blob = doc.output("blob");
+    lastPdf = { doc: doc, name: name, file: new File([blob], name, { type: "application/pdf" }) };
+    let dl = null;
+    try { dl = window.claude ? await window.claude.use("downloads") : null; } catch (e) { dl = null; }
+    let estado = "listo";
+    if (dl) {
+      await dl.save({ filename: name, data: blob });
+    } else {
+      estado = await compartirPdf();
+      if (estado === "no") { doc.save(name); estado = "listo"; }
+    }
+    mostrarListo(name, estado);
+  } catch (e) {
+    if (e && e.code === "declined") showMsg("err", "Descarga cancelada. Cuando quieras, vuelve a tocar Generar PDF.");
+    else if (e && e.code === "rate_limited") showMsg("err", "Ya hay una descarga pendiente. Espera un momento y vuelve a intentarlo.");
+    else showMsg("err", "No se pudo generar o guardar el PDF. Vuelve a intentarlo.");
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+/* ============================================================
+   INICIO
+   ============================================================ */
+loadState();
+loadPhotos();
+render();
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("./sw.js").catch(function () { /* sin service worker: la app sigue funcionando con internet */ });
+  });
+}
+</script>
+</body>
+</html>
