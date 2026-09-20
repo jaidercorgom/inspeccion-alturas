@@ -1,6 +1,6 @@
 /* Service worker de "Fichas de revisión de equipos de alturas".
    Cada vez que cambies archivos de la app, sube el número de VERSION para que los celulares se actualicen. */
-const VERSION = "1";
+const VERSION = "2";
 const CACHE = "revision-alturas-v" + VERSION;
 
 const CORE = [

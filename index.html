@@ -150,6 +150,8 @@
   }
   textarea { min-height: 96px; resize: vertical; line-height: 1.4; }
   input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; border-color: var(--focus); }
+  input[readonly] { background: var(--tint); cursor: default; }
+  .btn.armed:not(.ghost) { background: var(--d); border-color: var(--d); color: var(--on); }
   .selector { margin-top: 24px; }
   select { font-weight: 500; }
   .note { margin: 8px 0 0; font-size: 13px; color: var(--muted); }
@@ -777,8 +779,24 @@ function plus12m(iso) {
 }
 function fmtDate(iso) {
   if (!iso) return "";
+  if (iso === "NA") return "No aplica";
   const p = iso.split("-");
   return p.length === 3 ? p[2] + "/" + p[1] + "/" + p[0] : iso;
+}
+
+function actualizarProxima() {
+  let v = "";
+  if (S.v === "no_apto") v = "NA";
+  else if (S.v === "apto" && S.f.r_fecha) v = plus12m(S.f.r_fecha);
+  S.f.r_proxima = v;
+  const el = $("#r_proxima");
+  if (el) el.value = v ? fmtDate(v) : "";
+  const h = $("#proxHint");
+  if (h) h.textContent = S.v === "no_apto"
+    ? "Equipo no apto: no aplica próxima revisión."
+    : S.v === "apto"
+      ? "Se calcula sola: 12 meses después de la fecha de la revisión."
+      : "Se calcula sola al elegir el veredicto.";
 }
 
 let saveTimer = null;
@@ -972,12 +990,12 @@ function render() {
       fieldHTML("r_nombre", "Revisado por") +
       fieldHTML("r_empresa", "Empresa") +
       fieldHTML("r_fecha", "Fecha de la revisión", "date") +
-      '<label class="f"><span class="lbl">Fecha de la próxima revisión</span><input id="r_proxima" data-f="r_proxima" type="date"><span class="hint">Se sugiere a 12 meses. Ajústala según tu procedimiento.</span></label>' +
+      '<label class="f"><span class="lbl">Fecha de la próxima revisión</span><input id="r_proxima" type="text" readonly aria-readonly="true"><span class="hint" id="proxHint"></span></label>' +
     "</div>" +
 
     '<div class="actions">' +
       '<button type="button" class="btn" id="btnPdf">Generar PDF</button>' +
-      '<button type="button" class="btn ghost" id="btnClear">Borrar formulario</button>' +
+      '<button type="button" class="btn ghost" id="btnClear">Nueva inspección</button>' +
     "</div>" +
     '<div id="msg" class="msg" role="alert" tabindex="-1"></div>';
 
@@ -992,12 +1010,12 @@ function render() {
 
 function hydrate() {
   if (!S.f.r_fecha) S.f.r_fecha = todayISO();
-  if (!S.pm && !S.f.r_proxima) S.f.r_proxima = plus12m(S.f.r_fecha);
 
   app.querySelectorAll("[data-f]").forEach(function (el) { el.value = S.f[el.dataset.f] || ""; });
   app.querySelectorAll("input[data-a]").forEach(function (el) { el.checked = S.a[el.dataset.a] === el.value; });
   app.querySelectorAll('input[name="veredicto"]').forEach(function (el) { el.checked = S.v === el.value; });
   EQ.criterios.forEach(function (c) { syncCrit(c.id); });
+  actualizarProxima();
   paintPhotos();
   updateProgress();
 }
@@ -1047,12 +1065,7 @@ app.addEventListener("input", function (e) {
   }
   if (!t.dataset || !t.dataset.f) return;
   S.f[t.dataset.f] = t.value;
-  if (t.id === "r_fecha" && !S.pm) {
-    const nx = t.value ? plus12m(t.value) : "";
-    S.f.r_proxima = nx;
-    $("#r_proxima").value = nx;
-  }
-  if (t.id === "r_proxima") S.pm = true;
+  if (t.id === "r_fecha") actualizarProxima();
   queueSave();
 });
 app.addEventListener("change", function (e) {
@@ -1075,6 +1088,7 @@ app.addEventListener("change", function (e) {
   } else if (t.name === "veredicto") {
     S.v = t.value;
     updateVerdictHint();
+    actualizarProxima();
     queueSave();
   } else if (t.tagName === "SELECT" && t.dataset && t.dataset.f) {
     S.f[t.dataset.f] = t.value;
@@ -1085,7 +1099,7 @@ app.addEventListener("click", function (e) {
   const b = e.target.closest("button");
   if (!b) return;
   if (b.id === "btnPdf") onGenerate();
-  if (b.id === "btnClear") onClear(b);
+  if (b.id === "btnClear" || b.id === "btnNueva") onClear(b);
   if (b.id === "btnPhoto") $("#photoFile").click();
   if (b.dataset && b.dataset.pdf && lastPdf) {
     if (b.dataset.pdf === "download") lastPdf.doc.save(lastPdf.name);
@@ -1114,22 +1128,29 @@ function cambiarEquipo(id) {
   window.scrollTo({ top: 0 });
 }
 
-let armTimer = null;
-function onClear(btn) {
-  if (!btn.classList.contains("armed")) {
-    btn.classList.add("armed");
-    btn.textContent = "Toca otra vez para borrar todo";
-    clearTimeout(armTimer);
-    armTimer = setTimeout(function () { btn.classList.remove("armed"); btn.textContent = "Borrar formulario"; }, 4000);
-    return;
-  }
-  clearTimeout(armTimer);
+function nuevaInspeccion() {
+  const insp = { r_nombre: S.f.r_nombre || "", r_empresa: S.f.r_empresa || "" };
   S = fresh();
+  S.f.r_nombre = insp.r_nombre;
+  S.f.r_empresa = insp.r_empresa;
   photos = [];
   savePhotos();
   saveNow();
   render();
   window.scrollTo({ top: 0 });
+}
+
+let armTimer = null;
+function onClear(btn) {
+  if (!btn.classList.contains("armed")) {
+    btn.classList.add("armed");
+    btn.textContent = "Toca otra vez: se borra lo escrito";
+    clearTimeout(armTimer);
+    armTimer = setTimeout(function () { btn.classList.remove("armed"); btn.textContent = "Nueva inspección"; }, 4000);
+    return;
+  }
+  clearTimeout(armTimer);
+  nuevaInspeccion();
 }
 
 /* ============================================================
@@ -1453,7 +1474,8 @@ function mostrarListo(name, estado) {
     ? "No se compartió el PDF. Puedes compartirlo o descargarlo desde aquí."
     : "PDF listo: <strong>" + name + "</strong>";
   const botones = (puedeCompartir() ? '<button type="button" class="btn ghost" data-pdf="share">Compartir</button>' : "") +
-    '<button type="button" class="btn ghost" data-pdf="download">Descargar</button>';
+    '<button type="button" class="btn ghost" data-pdf="download">Descargar</button>' +
+    '<button type="button" class="btn" id="btnNueva">Nueva inspección</button>';
   showMsg("ok", texto + '<div class="msg-actions">' + botones + "</div>");
 }
 
